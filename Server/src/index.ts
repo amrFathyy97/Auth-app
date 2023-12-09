@@ -11,6 +11,7 @@ import authRouter from "./routes/auth"
 import path from 'path';
 import cors from "cors"
 import { errorHandler } from './middlewares/error-middleware';
+import { AuthRequest, verifyToken } from './middlewares/verifyToken';
 
 const app = express();
 
@@ -28,9 +29,16 @@ app.use(express.static(path.join(__dirname, "../public")));
 
 app.set('view engine', 'ejs');
 
-app.use("/user",userRouter)
+app.use("/user(s)?",userRouter)
 
 app.use("/login",authRouter)
+
+app.get("/us", verifyToken,async (req:AuthRequest, res, next) => {
+    console.log(req.headers["x-auth-token"]);
+    const user: any = req.user
+    return res.send(`<h1>Hello ${user.username}</h1>`)
+
+})
 
 app.all("/*", async (req: Request, res: Response, next: NextFunction) => {
     return res.render("404.ejs")

@@ -16,7 +16,7 @@ const schema: JSONSchemaType<IUser> = {
         username: {type: "string"},
         email: {type: "string"},
         password: {type: "string", minLength: 5},
-        isAdmin: {type: "boolean", default: false}
+        isAdmin: {type: "boolean", default: false, nullable: true}
     },
     required: ["username", "email", "password"]
     

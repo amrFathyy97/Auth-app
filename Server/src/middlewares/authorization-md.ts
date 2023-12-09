@@ -1,19 +1,22 @@
 import { NextFunction, Request, Response } from "express";
 
 import jwt from "jsonwebtoken"
+import { CustomError } from "./CustomError";
+import { asyncFunction } from "./asyncHandler";
 
-export const authorizationMiddleware =async  (req: Request, res: Response, next: NextFunction) => {
-    try {
-        
-        const token = req.header("x-auth-token");
-        if(!token) return res.status(401).send("<h1>Access denied</h1>");
-        const decodedPayload = jwt.verify(token, `${process.env.SECRET_KEY}`);
-        if(!decodedPayload.admin) {
-            return res.status(401).send("<h1>Access denied</h1>");
+export const authorizeMiddleware = asyncFunction(
+    async (req: Request, res: Response, next: NextFunction) => {
+        const token: any = req.headers["x-auth-token"]
+        if(!token){
+            const err = new CustomError("No token provided", 403, "Forbidden")
+            return next(err);
         }
-        next()
-    }catch(err){
-        return res.status(400).send("<h1>Invalid token...</h1>")
+        const decoded: any = jwt.verify(token, `${process.env.SECRET_KEY}`);
+        if(decoded.admin){
+            next();
+        }else {
+            const err = new CustomError("Access denied", 401, "Unauthorized");
+            return next(err)
+        }
     }
-
-}
+)

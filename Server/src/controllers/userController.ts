@@ -6,6 +6,20 @@ import { User } from "../models/userModel"
 import { asyncFunction } from "../middlewares/asyncHandler"
 import { CustomError } from "../middlewares/CustomError"
 
+
+
+
+export const getAllUsers = asyncFunction(
+    async (req: Request, res: Response, next: NextFunction) => {
+        const users = await User.find()
+        return res.json({
+            message: "OK",
+            data: users
+        })
+    }
+)
+
+
 export const register = asyncFunction(
     async (req: Request, res: Response, next: NextFunction) => {
         const hashed = await bcrypt.hash(req.body.password, 10);
@@ -34,27 +48,22 @@ export const register = asyncFunction(
 
 
 
-
-
-
-
-
-
-// export const getUsers = async (req: Request, res: Response, next: NextFunction) => {
-//     try {
-//         const users = await User.find({})
-//         if(users.length < 0) {
-//             return res.status(404).json({
-//                 message: "User not found"
-//             })
-//         }
-//         return res.status(200).json({
-//             message: "OK",
-//             data: users
-//         })
-//     }catch(err){
-//         return res.status(500).json({
-//             message: "Something went wrong"
-//         })
-//     }
-// }
+export const updateUser = asyncFunction(
+    async (req: Request, res: Response, next: NextFunction) => {
+        if(req.body.password){
+            const salt = await bcrypt.genSalt(10)
+            req.body.password = await bcrypt.hash(req.body.password, salt)
+        }
+        const updatedUser = await User.findByIdAndUpdate(req.params.id, {
+            $set: {
+                username: req.body.username,
+                email: req.body.email,
+                password: req.body.password
+            }
+        }, {new: true});
+        return res.status(200).json({
+            message: "OK",
+            data: updatedUser
+        })
+    }
+)
