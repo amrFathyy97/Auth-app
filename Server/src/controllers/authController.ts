@@ -9,12 +9,12 @@ export const login = asyncFunction(
     async (req: Request, res: Response, next: NextFunction) => {
         const user = await User.findOne({email: req.body.email});
         if(!user) {
-            const err = new CustomError("Invalid username or password", 401, "Unauthorized")
+            const err = await new CustomError("Invalid username or password", 401, "Unauthorized")
             return next(err);
         }
         const password = await bcrypt.compare(req.body.password, user.password);
         if(!password){
-            const err = new CustomError("Invalid username or password", 401, "Unauthorized")
+            const err = await new CustomError("Invalid username or password", 401, "Unauthorized")
             return next(err);
         }
         const token = await user.genAuthToken()

@@ -5,6 +5,7 @@ import bcrypt from "bcrypt"
 import { User } from "../models/userModel"
 import { asyncFunction } from "../middlewares/asyncHandler"
 import { CustomError } from "../middlewares/CustomError"
+import { AuthRequest } from "../middlewares/verifyToken"
 
 
 
@@ -25,7 +26,7 @@ export const register = asyncFunction(
         const hashed = await bcrypt.hash(req.body.password, 10);
         const duplicated = await User.findOne({email: req.body.email});
         if(duplicated){
-            const err = new CustomError("Email already in use", 400, "Bad Request");
+            const err = await new CustomError("Email already in use", 400, "Bad Request");
             console.log(err);
             return next(err)
         }
@@ -49,7 +50,12 @@ export const register = asyncFunction(
 
 
 export const updateUser = asyncFunction(
-    async (req: Request, res: Response, next: NextFunction) => {
+    async (req: AuthRequest, res: Response, next: NextFunction) => {
+        const user_id = await req.user?._id.toString()
+            if(req.params.id !== user_id){
+            const err = await new CustomError("Not allowed", 403, "Forbidden");
+            return next(err);
+        }
         if(req.body.password){
             const salt = await bcrypt.genSalt(10)
             req.body.password = await bcrypt.hash(req.body.password, salt)

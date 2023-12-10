@@ -1,13 +1,9 @@
 import Ajv, {JSONSchemaType} from "ajv";
+import { IUser } from "../types";
 
 const ajv = new Ajv();
 
-export interface IUser {
-    username: string;
-    email: string;
-    password: string;
-    isAdmin?: boolean;
-}
+
 
 
 const schema: JSONSchemaType<IUser> = {

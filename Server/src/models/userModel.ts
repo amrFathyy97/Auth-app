@@ -1,10 +1,7 @@
-import { Schema, model } from "mongoose";
-import { IUser } from "../utils/user-validator";
+import { ObjectId, Schema, model } from "mongoose";
 import jwt from "jsonwebtoken"
+import { IUserSchema } from "../types";
 
-interface IUserSchema extends IUser{
-    genAuthToken: ()=> string
-}
 
 
 

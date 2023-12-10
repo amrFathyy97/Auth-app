@@ -1,14 +1,11 @@
 import Ajv, {JSONSchemaType} from "ajv";
+import { Login } from "../types";
 
 const ajv = new Ajv();
 
-interface IUser {
-    email: string;
-    password: string;
-}
 
 
-const schema: JSONSchemaType<IUser> = {
+const schema: JSONSchemaType<Login> = {
     type: "object",
     properties: {
         email: {type: "string"},
