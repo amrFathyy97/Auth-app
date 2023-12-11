@@ -1,3 +1,5 @@
+import jwt  from 'jsonwebtoken';
+import { AuthRequest } from './../types.d';
 import {Request, Response ,NextFunction } from "express"
 
 import bcrypt from "bcrypt"
@@ -5,8 +7,6 @@ import bcrypt from "bcrypt"
 import { User } from "../models/userModel"
 import { asyncFunction } from "../middlewares/asyncHandler"
 import { CustomError } from "../middlewares/CustomError"
-import { AuthRequest } from "../middlewares/verifyToken"
-
 
 
 
@@ -36,7 +36,7 @@ export const register = asyncFunction(
             password: hashed,
         });
         await user.save();
-        const createdUser = await User.findOne({email: req.body.email}).select({username: 1, email: 1})
+        const createdUser = await User.findOne({email: req.body.email}).select('-password')
         const token = await user.genAuthToken()
         res.header("x-auth-token", token)
         return res.status(201).json({
@@ -51,9 +51,11 @@ export const register = asyncFunction(
 
 export const updateUser = asyncFunction(
     async (req: AuthRequest, res: Response, next: NextFunction) => {
-        const user_id = await req.user?._id.toString()
-            if(req.params.id !== user_id){
-            const err = await new CustomError("Not allowed", 403, "Forbidden");
+        if(req.user?.isAdmin){
+            const user = await User.updateOne({_id: req.params.id}, {$set: {isAdmin: req.body.isAdmin}});
+        }
+        if(req.body.isAdmin !== undefined && !req.user?.isAdmin){
+            const err = new CustomError("You do not have permission to update this field.", 401, "Unauthorized");
             return next(err);
         }
         if(req.body.password){

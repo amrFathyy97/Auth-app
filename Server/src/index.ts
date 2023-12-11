@@ -1,3 +1,4 @@
+import { AuthRequest } from './types.d';
 import { mongoDB } from './db';
 import express, {Request, Response, NextFunction } from "express";
 import dotenv from "dotenv";
@@ -11,7 +12,7 @@ import authRouter from "./routes/auth"
 import path from 'path';
 import cors from "cors"
 import { errorHandler } from './middlewares/error-middleware';
-import { AuthRequest, verifyToken } from './middlewares/verifyToken';
+import { verifyToken } from './middlewares/verifyToken';
 
 const app = express();
 

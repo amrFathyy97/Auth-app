@@ -1,3 +1,4 @@
+import { Request } from "express";
 
 export interface Login {
     email: string;
@@ -13,3 +14,9 @@ export interface IUserSchema extends IUser{
     _id: ObjectId
     genAuthToken: ()=> string
 }
+
+
+export interface AuthRequest extends Request {
+    user?: IUserSchema
+}
+
