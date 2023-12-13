@@ -20,13 +20,27 @@ export const getAllUsers = asyncFunction(
     }
 )
 
+export const getUserById = asyncFunction(
+    async (req: Request, res: Response, next: NextFunction) => {
+        const user = await User.findById(req.params.id);
+        if(!user){
+            const err = new CustomError("User not found", 404, "Not Found");
+            return next(err);
+        }
+        return res.json({
+            message: "OK",
+            data: user
+        })
+    }
+)
+
 
 export const register = asyncFunction(
     async (req: Request, res: Response, next: NextFunction) => {
         const hashed = await bcrypt.hash(req.body.password, 10);
         const duplicated = await User.findOne({email: req.body.email});
         if(duplicated){
-            const err = await new CustomError("Email already in use", 400, "Bad Request");
+            const err = new CustomError("Email already in use", 400, "Bad Request");
             console.log(err);
             return next(err)
         }
@@ -72,6 +86,21 @@ export const updateUser = asyncFunction(
         return res.status(200).json({
             message: "OK",
             data: updatedUser
+        })
+    }
+)
+
+export const deleteUser = asyncFunction(
+    async (req: Request, res: Response, next: NextFunction) => {
+        const targetUser = await User.findById(req.params.id);
+        if(!targetUser){
+            const err = new CustomError("User not found", 404, "Not Found");
+            return next(err)
+        }
+        await User.findByIdAndDelete(req.params.id);
+        return res.json({
+            message: "OK",
+            data: null
         })
     }
 )
