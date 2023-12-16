@@ -1,36 +1,27 @@
-import { useForm } from "react-hook-form";
+import { useForm } from 'react-hook-form';
+import { yupResolver } from "@hookform/resolvers/yup"
+import * as yup from "yup"
 
-// The following component is an example of your existing Input Component
-const Input = ({ label, register, required }) => (
-  <>
-    <label>{label}</label>
-    <input {...register(label, { required })} />
-  </>
-);
 
-// you can use React.forwardRef to pass the ref too
-const Select = React.forwardRef(({ onChange, onBlur, name, label }, ref) => (
-  <>
-    <label>{label}</label>
-    <select name={name} ref={ref} onChange={onChange} onBlur={onBlur}>
-      <option value="20">20</option>
-      <option value="30">30</option>
-    </select>
-  </>
-));
-
-const App = () => {
-  const { register, handleSubmit } = useForm();
-
-  const onSubmit = (data) => {
-    alert(JSON.stringify(data));
-  };
-
+const Register = () => {
+  const schema = yup.object({
+    username: yup.string().required(),
+    email: yup.string().required().email(),
+    password: yup.string().required()
+  }).required()
+  const {register, handleSubmit, formState: {errors}} = useForm({
+    resolver: yupResolver(schema)
+  });
   return (
-    <form onSubmit={handleSubmit(onSubmit)}>
-      <Input label="First Name" register={register} required />
-      <Select label="Age" {...register("Age")} />
-      <input type="submit" />
-    </form>
-  );
-};
+
+    <form className="container rounded-md dark:bg-black flex flex-col h-96 justify-evenly align-items-center " onSubmit={handleSubmit((data) => console.log(data))}>
+      <input placeholder='Username' {...register('username')} />
+      <input placeholder='Email' {...register('email')} />
+      {errors.email && <p> {errors.email?.message} </p>}
+      <input placeholder='Password' type='password' {...register('password', { pattern: /\d+/ })} />
+      {errors.age && <p>Please enter number for age.</p>}
+      <input className='bg-sky-500 text-white w-20 rounded-lg p-2  md:hover:bg-red-400 sm:hover:bg-slate-600' type="submit" />
+    </form> 
+)}
+
+export default Register
