@@ -7,8 +7,8 @@ mongoDB();
 dotenv.config()
 
 import userRouter from "./routes/user"
-
 import authRouter from "./routes/auth"
+import resetPassword from "./routes/resetPWD"
 import path from 'path';
 import cors from "cors"
 import { errorHandler } from './middlewares/error-middleware';
@@ -33,6 +33,8 @@ app.set('view engine', 'ejs');
 app.use("/user(s)?",userRouter)
 
 app.use("/login",authRouter)
+
+app.use("/password", resetPassword)
 
 app.get("/us", verifyToken,async (req:AuthRequest, res, next) => {
     console.log(req.headers["x-auth-token"]);
