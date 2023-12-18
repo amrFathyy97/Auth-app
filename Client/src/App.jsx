@@ -6,9 +6,11 @@ const App = () => {
   return (
     <BrowserRouter>
     <Navbar/>
+    <div className="root container mx-auto">
     <Routes>
       <Route path="register" element={<Register/>}/>
     </Routes>
+    </div>
     </BrowserRouter>
   )
 }

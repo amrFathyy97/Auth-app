@@ -1,0 +1,18 @@
+:root {
+    --background-color: #ffffff;
+    --text-color: #333333;
+  }
+
+  body {
+    background-color: var(--background-color);
+    color: var(--text-color);
+    transition: background-color 0.3s, color 0.3s;
+  }
+
+
+@media (prefers-color-scheme: dark) {
+    :root {
+        --background-color: #1f1f1f;
+        --text-color: #ffffff;
+      }
+}

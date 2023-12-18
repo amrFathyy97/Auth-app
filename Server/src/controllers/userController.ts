@@ -12,7 +12,9 @@ import { CustomError } from "../middlewares/CustomError"
 
 export const getAllUsers = asyncFunction(
     async (req: Request, res: Response, next: NextFunction) => {
-        const users = await User.find()
+        const search_key = await Object.keys(req.query)[0] || "username"
+        const page = await Number(req.query.page) || 1
+        const users = await User.find({[search_key]: {$regex: req.query[search_key] || ""}}).limit(2).skip((page - 1) * 2)
         return res.json({
             message: "OK",
             data: users

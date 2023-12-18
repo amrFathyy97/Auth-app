@@ -1,5 +1,5 @@
 import { AuthRequest } from './types.d';
-import { mongoDB } from './db';
+import { mongoDB } from './config/db';
 import express, {Request, Response, NextFunction } from "express";
 import dotenv from "dotenv";
 import helmet from 'helmet';
