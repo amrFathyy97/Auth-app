@@ -1,0 +1,4 @@
+.vsode/launch.json
+dist
+.env
+node_modules
