@@ -1,5 +1,5 @@
 import express from 'express';
-import { deleteUser, getAllUsers, getUserById, register, registerPage, updateUser } from '../controllers/userController';
+import { deleteUser, emailConfirm, getAllUsers, getUserById, register, registerPage, updateUser } from '../controllers/userController';
 import { userMiddleware } from '../middlewares/user-middleware';
 import { Authorization, cookieHandler, verifyToken } from '../middlewares/verifyToken';
 
@@ -15,6 +15,8 @@ router.get("/", cookieHandler, registerPage)
 
 
 router.post("/", userMiddleware,register)
+
+router.get("/:token", emailConfirm)
 
 router.put("/:id", userMiddleware,verifyToken, Authorization, updateUser)
 

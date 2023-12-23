@@ -1,6 +1,7 @@
 import jwt  from 'jsonwebtoken';
 import { AuthRequest } from './../types.d';
 import {Request, Response ,NextFunction } from "express"
+import nodemailer from "nodemailer"
 
 import bcrypt from "bcrypt"
 
@@ -43,6 +44,22 @@ export const registerPage = asyncFunction(
     }
 )
 
+
+export const emailConfirm = asyncFunction(
+    async (req: Request, res: Response, next: NextFunction) => {
+        if(req.params.token){
+            const decoded: any = await jwt.verify(req.params.token, `${process.env.SECRET_KEY}`);
+            await User.findByIdAndUpdate(decoded.id, {$set: {active: true}});
+            return res.redirect("/")
+        }else {
+            return res.json({
+                message: "Something went x"
+            })
+        }
+    }
+)
+
+
 export const register = asyncFunction(
     async (req: Request, res: Response, next: NextFunction) => {
         const hashed = await bcrypt.hash(req.body.password, 10);
@@ -58,10 +75,37 @@ export const register = asyncFunction(
         await user.save();
         const createdUser = await User.findOne({email: req.body.email}).select('-password')
         const token = await user.genAuthToken()
+        const activeToken = await jwt.sign({id: createdUser?._id}, `${process.env.SECRET_KEY}`, {expiresIn: "10min"});
+        const link = await `http://localhost:3000/register/${activeToken}`;
+        const transporter = await nodemailer.createTransport({
+            service: "gmail",
+            auth: {
+                user: `${process.env.EMAIL_USER}`,
+                pass: `${process.env.EMAIL_PASSWORD}`
+            },
+            secure: true
+        });
+        const emailInfo = await transporter.sendMail({
+            to: createdUser?.email,
+            subject: "Confirm Email",
+            html: `<div>
+            <h4>Email Confirmation</h4>
+            <h3>Click on link below</h3>
+            <p>
+            <a href=${link}>${link}</a>
+            </p>
+            </div>`
+            
+        }, (err,success)=>{
+            if(err){
+                console.log(err)
+            }else {
+                console.log(success.response)
+            }
+        });
         res.cookie("token", token, {httpOnly: true, secure: true})
         res.header("Authorization", token);
-        return res.redirect("/")
-    
+        return res.send("<div><h1>Please check your email to confirm it</h1></div>");
 }
 )
 

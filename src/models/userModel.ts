@@ -15,7 +15,7 @@ const schema = new Schema<IUserSchema>({
         type: "string",
         required: true,
         unique: true,
-        match: [/^[a-zA-Z]+@\w{3,7}.\w{2,6}/,"Email pattern does not match"],
+        match: [/^[a-zA-Z]+.*@\w{2,8}.\w{2,8}/,"Email pattern does not match"],
         lowercase: true
     },
     password: {
@@ -27,6 +27,10 @@ const schema = new Schema<IUserSchema>({
         type: "boolean",
         default: false,
         
+    },
+    active: {
+        type: "boolean",
+        default: false,
     }
 });
 

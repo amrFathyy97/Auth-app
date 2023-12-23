@@ -13,6 +13,7 @@ export interface IUser extends Login {
 export interface IUserSchema extends IUser{
     _id: ObjectId
     genAuthToken: ()=> string
+    active: boolean
 }
 
 
