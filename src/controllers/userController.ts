@@ -1,13 +1,13 @@
 import jwt  from 'jsonwebtoken';
 import { AuthRequest } from './../types.d';
 import {Request, Response ,NextFunction } from "express"
-import nodemailer from "nodemailer"
 
 import bcrypt from "bcrypt"
 
 import { User } from "../models/userModel"
 import { asyncFunction } from "../middlewares/asyncHandler"
 import { CustomError } from "../middlewares/CustomError"
+import { emailSender, transporter } from '../config/nodemailer';
 
 
 
@@ -77,35 +77,12 @@ export const register = asyncFunction(
         const token = await user.genAuthToken()
         const activeToken = await jwt.sign({id: createdUser?._id}, `${process.env.SECRET_KEY}`, {expiresIn: "10min"});
         const link = await `http://localhost:3000/register/${activeToken}`;
-        const transporter = await nodemailer.createTransport({
-            service: "gmail",
-            auth: {
-                user: `${process.env.EMAIL_USER}`,
-                pass: `${process.env.EMAIL_PASSWORD}`
-            },
-            secure: true
-        });
-        const emailInfo = await transporter.sendMail({
-            to: createdUser?.email,
-            subject: "Confirm Email",
-            html: `<div>
-            <h4>Email Confirmation</h4>
-            <h3>Click on link below</h3>
-            <p>
-            <a href=${link}>${link}</a>
-            </p>
-            </div>`
-            
-        }, (err,success)=>{
-            if(err){
-                console.log(err)
-            }else {
-                console.log(success.response)
-            }
-        });
+        if(createdUser){
+            await emailSender(createdUser?.email, link)
+        }
         res.cookie("token", token, {httpOnly: true, secure: true})
         res.header("Authorization", token);
-        return res.send("<div><h1>Please check your email to confirm it</h1></div>");
+        return res.render("confirm-email")
 }
 )
 

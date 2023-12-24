@@ -4,6 +4,7 @@ import { User } from '../models/userModel';
 import { asyncFunction } from '../middlewares/asyncHandler';
 import { CustomError } from '../middlewares/CustomError';
 import jwt from "jsonwebtoken"
+import { emailSender } from '../config/nodemailer';
 
 export const loginPage = asyncFunction(
     async (req: Request, res: Response, next: NextFunction) =>{
@@ -47,10 +48,8 @@ export const sendForgotLink = asyncFunction(
             expiresIn: "15m"
         });
         const link = `http://localhost:3000/password/reset/${user._id}/${token}`;
-        res.json({
-            message: "Click on the link",
-            reset: link
-        })
+        await emailSender(req.body.email, link)
+        return res.send("<h1>Check your email</h1>")
     }
 )
 

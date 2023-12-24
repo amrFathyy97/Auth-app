@@ -13,7 +13,7 @@ import resetPassword from "./routes/resetPWD"
 import path from 'path';
 import cors from "cors"
 import { errorHandler } from './middlewares/error-middleware';
-import { cookieHandler, verifyToken } from './middlewares/verifyToken';
+import {  verifyToken } from './middlewares/verifyToken';
 
 const app = express();
 
