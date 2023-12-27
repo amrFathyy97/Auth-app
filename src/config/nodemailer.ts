@@ -25,7 +25,7 @@ export const emailSender = async (email: string, link: string) => {
         });
         console.log("Email sent successfully");
     }catch(err){
-        console.log(err)
+        console.log("Email cannot be sent")
     }
 }
 
